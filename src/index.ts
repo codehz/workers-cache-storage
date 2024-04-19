@@ -138,5 +138,5 @@ export class WorkersCacheStorage<K extends {}, V extends {}> {
   }
 }
 
-/** @deprecated: use CacheStorage */
+/** @deprecated: use WorkersCacheStorage */
 export const CacheStorage = WorkersCacheStorage;
