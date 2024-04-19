@@ -6,7 +6,7 @@ type Converters<K extends {}, V extends {}> = {
   decode(value: Response): V | Promise<V>;
 };
 
-export class CacheStorage<K extends {}, V extends {}> {
+export class WorkersCacheStorage<K extends {}, V extends {}> {
   #name: string;
   #cache?: Cache;
   #converters: Converters<K, V>;
@@ -65,7 +65,7 @@ export class CacheStorage<K extends {}, V extends {}> {
     name: string,
     overrides: ((ttl: number) => string) | boolean = false
   ) {
-    return new CacheStorage<Request, Response>(name, {
+    return new WorkersCacheStorage<Request, Response>(name, {
       key(key) {
         return key;
       },
@@ -91,17 +91,17 @@ export class CacheStorage<K extends {}, V extends {}> {
     });
   }
 
-  static json<V extends {}>(name: string): CacheStorage<string, V>;
+  static json<V extends {}>(name: string): WorkersCacheStorage<string, V>;
   static json<K extends {}, V extends {}>(
     name: string,
     key: (key: K) => RequestInfo
-  ): CacheStorage<K, V>;
+  ): WorkersCacheStorage<K, V>;
   static json<K extends {}, V extends {}>(
     name: string,
     key: (key: K) => RequestInfo = (key: any) =>
       `http://dummy?${encodeURIComponent(key)}`
   ) {
-    return new CacheStorage<K, V>(name, {
+    return new WorkersCacheStorage<K, V>(name, {
       key,
       value(value, ttl) {
         return new Response(JSON.stringify(value), {
@@ -114,17 +114,17 @@ export class CacheStorage<K extends {}, V extends {}> {
     });
   }
 
-  static text(name: string): CacheStorage<string, string>;
+  static text(name: string): WorkersCacheStorage<string, string>;
   static text<K extends {}>(
     name: string,
     key: (key: K) => RequestInfo
-  ): CacheStorage<K, string>;
+  ): WorkersCacheStorage<K, string>;
   static text<K extends {}>(
     name: string,
     key: (key: K) => RequestInfo = (key: any) =>
       `http://dummy?${encodeURIComponent(key)}`
   ) {
-    return new CacheStorage<K, string>(name, {
+    return new WorkersCacheStorage<K, string>(name, {
       key,
       value(value, ttl) {
         return new Response(value, {
@@ -137,3 +137,6 @@ export class CacheStorage<K extends {}, V extends {}> {
     });
   }
 }
+
+/** @deprecated: use CacheStorage */
+export const CacheStorage = WorkersCacheStorage;
