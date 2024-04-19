@@ -1,0 +1,17 @@
+{
+  "name": "workers-cache-storage",
+  "module": "src/index.ts",
+  "type": "module",
+  "devDependencies": {
+    "@types/bun": "^1.1.0",
+    "bun-plugin-dts": "^0.2.3",
+    "typescript": "^5.0.0"
+  },
+  "peerDependencies": {
+    "@cloudflare/workers-types": "^4.20240405.0"
+  },
+  "dependencies": {},
+  "scripts": {
+    "build": "bun run ./build.ts"
+  }
+}

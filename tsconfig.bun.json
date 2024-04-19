@@ -1,0 +1,8 @@
+{
+  "compilerOptions": {
+    "composite": true,
+    "emitDeclarationOnly": true,
+    "types": ["bun"]
+  },
+  "include": ["build.ts"]
+}
