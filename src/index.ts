@@ -40,20 +40,21 @@ export class WorkersCacheStorage<K extends {}, V extends {}> {
     return response && (await this.#converters.decode(response));
   }
 
-  async wrap(
+  async wrap<R extends V = V>(
     key: K,
     waitUntil: (promise: Promise<any>) => void,
-    getValue: () => Promise<V>,
+    getValue: () => Promise<R>,
     ttl = this.defaultTtl
-  ): Promise<V> {
+  ): Promise<R> {
     const cache = await this.#ensureCache();
     const request = this.#converters.key(key);
     const response = await cache.match(request);
     if (response) {
-      return await this.#converters.decode(response);
+      return (await this.#converters.decode(response)) as R;
     } else {
       let value = await getValue();
-      if (this.#converters.patch) value = this.#converters.patch(value, ttl);
+      if (this.#converters.patch)
+        value = this.#converters.patch(value, ttl) as any;
       const response = this.#converters.value(value, ttl);
       if (response.ok && response.status === 200)
         waitUntil(cache.put(request, response));
