@@ -1,5 +1,15 @@
 {
   "name": "workers-cache-storage",
+  "version": "0.0.1",
+  "author": {
+    "name": "CodeHz",
+    "email": "git@hertz.moe"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/CodeHz/workers-cache-storage.git"
+  },
+  "license": "MIT",
   "module": "src/index.ts",
   "type": "module",
   "devDependencies": {
@@ -13,6 +23,5 @@
   "dependencies": {},
   "scripts": {
     "build": "bun run ./build.ts"
-  },
-  "version": "0.0.1"
+  }
 }
