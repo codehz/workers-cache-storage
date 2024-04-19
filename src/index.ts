@@ -54,7 +54,9 @@ export class CacheStorage<K extends {}, V extends {}> {
     } else {
       let value = await getValue();
       if (this.#converters.patch) value = this.#converters.patch(value, ttl);
-      waitUntil(cache.put(request, this.#converters.value(value, ttl)));
+      const response = this.#converters.value(value, ttl);
+      if (response.ok && response.status === 200)
+        waitUntil(cache.put(request, response));
       return value;
     }
   }
