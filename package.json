@@ -22,6 +22,7 @@
   },
   "dependencies": {},
   "scripts": {
-    "build": "bun run ./build.ts"
+    "build": "bun run ./build.ts",
+    "publish": "bun run build && cd dist && npm publish"
   }
 }
