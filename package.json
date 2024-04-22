@@ -7,7 +7,7 @@
   },
   "repository": {
     "type": "git",
-    "url": "https://github.com/CodeHz/workers-cache-storage.git"
+    "url": "git+https://github.com/CodeHz/workers-cache-storage.git"
   },
   "license": "MIT",
   "module": "src/index.ts",
