@@ -1,4 +1,4 @@
-type Converters<K extends {}, V extends {}> = {
+type Converters<K extends {}, V> = {
   key(key: K): RequestInfo;
   /** hack for response patch */
   patch?(value: Awaited<V>, ttl: number): Awaited<V>;
@@ -6,7 +6,7 @@ type Converters<K extends {}, V extends {}> = {
   decode(value: Response): V | Promise<V>;
 };
 
-export class WorkersCacheStorage<K extends {}, V extends {}> {
+export class WorkersCacheStorage<K extends {}, V> {
   #name: string;
   #cache?: Cache;
   #converters: Converters<K, V>;
@@ -134,6 +134,28 @@ export class WorkersCacheStorage<K extends {}, V extends {}> {
       },
       decode(value: Response) {
         return value.text();
+      },
+    });
+  }
+  static void(name: string): WorkersCacheStorage<string, void>;
+  static void<K extends {}>(
+    name: string,
+    key: (key: K) => RequestInfo
+  ): WorkersCacheStorage<K, void>;
+  static void<K extends {}>(
+    name: string,
+    key: (key: K) => RequestInfo = (key: any) =>
+      `http://dummy?${encodeURIComponent(key)}`
+  ): WorkersCacheStorage<K, void> {
+    return new WorkersCacheStorage<K, void>(name, {
+      decode(_) {
+        return;
+      },
+      key,
+      value(_, ttl) {
+        return new Response(null, {
+          headers: { "Cache-Control": `max-age=${ttl}` },
+        });
       },
     });
   }
