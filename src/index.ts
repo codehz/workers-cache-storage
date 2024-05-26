@@ -83,7 +83,7 @@ export class WorkersCacheStorage<K extends {}, V> {
       );
     }
     wrapper.reset = (...params: P) => this.delete(getKey(...params));
-    return wrapper;
+    return wrapper.bind(this);
   }
 
   static forHttpResponse(
