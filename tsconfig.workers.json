@@ -6,7 +6,8 @@
     "module": "ESNext",
     "emitDeclarationOnly": true,
     "types": ["@cloudflare/workers-types"],
-    "outDir": "dist"
+    "outDir": "dist",
+    "strict": true
   },
   "include": ["src/*.ts"]
 }

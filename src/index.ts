@@ -6,6 +6,11 @@ type Converters<K extends {}, V> = {
   decode(value: Response): V | Promise<V>;
 };
 
+export type WrapOptions = {
+  ttl?: number;
+  waitUntil?: (promise: Promise<any>) => void;
+};
+
 export class WorkersCacheStorage<K extends {}, V> {
   #name: string;
   #cache?: Cache;
@@ -48,9 +53,8 @@ export class WorkersCacheStorage<K extends {}, V> {
 
   async wrap<R extends V = V>(
     key: K,
-    waitUntil: (promise: Promise<any>) => void,
     getValue: () => Promise<R>,
-    ttl = this.defaultTtl
+    { ttl = this.defaultTtl, waitUntil }: WrapOptions = {}
   ): Promise<R> {
     const cache = await this.#ensureCache();
     const request = this.#converters.key(key);
@@ -63,25 +67,21 @@ export class WorkersCacheStorage<K extends {}, V> {
         value = this.#converters.patch(value, ttl) as any;
       const response = this.#converters.value(value, ttl);
       if (response.ok && response.status === 200)
-        waitUntil(cache.put(request, response));
+        waitUntil
+          ? waitUntil(cache.put(request, response))
+          : await cache.put(request, response);
       return value;
     }
   }
 
   define<P extends any[] = any[], R extends V = V>(
     getKey: (...params: P) => K,
-    waitUntil: (promise: Promise<any>) => void,
     getValue: (...params: P) => Promise<R>,
-    ttl = this.defaultTtl
+    options?: WrapOptions
   ): { (...params: P): Promise<R>; reset(...params: P): Promise<boolean> } {
     return Object.assign(
       (...params: P) => {
-        return this.wrap(
-          getKey(...params),
-          waitUntil,
-          () => getValue(...params),
-          ttl
-        );
+        return this.wrap(getKey(...params), () => getValue(...params), options);
       },
       {
         reset: (...params: P) => this.delete(getKey(...params)),
