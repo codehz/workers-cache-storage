@@ -74,16 +74,19 @@ export class WorkersCacheStorage<K extends {}, V> {
     getValue: (...params: P) => Promise<R>,
     ttl = this.defaultTtl
   ): { (...params: P): Promise<R>; reset(...params: P): Promise<boolean> } {
-    return Object.assign((...params: P) => {
-      return this.wrap(
-        getKey(...params),
-        waitUntil,
-        () => getValue(...params),
-        ttl
-      );
-    }, {
-      reset: (...params: P) => this.delete(getKey(...params)),
-    });
+    return Object.assign(
+      (...params: P) => {
+        return this.wrap(
+          getKey(...params),
+          waitUntil,
+          () => getValue(...params),
+          ttl
+        );
+      },
+      {
+        reset: (...params: P) => this.delete(getKey(...params)),
+      }
+    );
   }
 
   static forHttpResponse(
@@ -137,6 +140,22 @@ export class WorkersCacheStorage<K extends {}, V> {
         return value.json();
       },
     });
+  }
+
+  static typed<T extends Record<string, unknown>>(
+    name: string
+  ): {
+    put<K extends keyof T>(key: K, value: T[K], ttl?: number): Promise<void>;
+    get<K extends keyof T>(key: K): Promise<T[K] | undefined>;
+    delete(key: keyof T): Promise<boolean>;
+    wrap<K extends keyof T>(
+      key: K,
+      waitUntil: (promise: Promise<any>) => void,
+      getValue: () => Promise<T[K]>,
+      ttl?: number
+    ): Promise<T[K]>;
+  } {
+    return WorkersCacheStorage.json(name) as any;
   }
 
   static text(name: string): WorkersCacheStorage<string, string>;
