@@ -145,6 +145,7 @@ export class WorkersCacheStorage<K extends {}, V> {
   static typed<T extends Record<string, unknown>>(
     name: string
   ): {
+    defaultTtl: number;
     put<K extends keyof T>(key: K, value: T[K], ttl?: number): Promise<void>;
     get<K extends keyof T>(key: K): Promise<T[K] | undefined>;
     delete(key: keyof T): Promise<boolean>;
