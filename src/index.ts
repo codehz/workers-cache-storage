@@ -74,16 +74,16 @@ export class WorkersCacheStorage<K extends {}, V> {
     getValue: (...params: P) => Promise<R>,
     ttl = this.defaultTtl
   ): { (...params: P): Promise<R>; reset(...params: P): Promise<boolean> } {
-    function wrapper(...params: P) {
+    return Object.assign((...params: P) => {
       return this.wrap(
         getKey(...params),
         waitUntil,
         () => getValue(...params),
         ttl
       );
-    }
-    wrapper.reset = (...params: P) => this.delete(getKey(...params));
-    return wrapper.bind(this);
+    }, {
+      reset: (...params: P) => this.delete(getKey(...params)),
+    });
   }
 
   static forHttpResponse(
