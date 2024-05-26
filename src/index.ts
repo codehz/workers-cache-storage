@@ -40,6 +40,12 @@ export class WorkersCacheStorage<K extends {}, V> {
     return response && (await this.#converters.decode(response));
   }
 
+  async delete(key: K): Promise<boolean> {
+    const cache = await this.#ensureCache();
+    const request = this.#converters.key(key);
+    return cache.delete(request);
+  }
+
   async wrap<R extends V = V>(
     key: K,
     waitUntil: (promise: Promise<any>) => void,
