@@ -68,6 +68,24 @@ export class WorkersCacheStorage<K extends {}, V> {
     }
   }
 
+  define<P extends any[] = any[], R extends V = V>(
+    getKey: (...params: P) => K,
+    waitUntil: (promise: Promise<any>) => void,
+    getValue: (...params: P) => Promise<R>,
+    ttl = this.defaultTtl
+  ): { (...params: P): Promise<R>; reset(...params: P): Promise<boolean> } {
+    function wrapper(...params: P) {
+      return this.wrap(
+        getKey(...params),
+        waitUntil,
+        () => getValue(...params),
+        ttl
+      );
+    }
+    wrapper.reset = (...params: P) => this.delete(getKey(...params));
+    return wrapper;
+  }
+
   static forHttpResponse(
     name: string,
     overrides: ((ttl: number) => string) | boolean = false
