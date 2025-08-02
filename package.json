@@ -1,6 +1,6 @@
 {
   "name": "workers-cache-storage",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "author": {
     "name": "CodeHz",
     "email": "git@hertz.moe"
@@ -23,6 +23,6 @@
   "dependencies": {},
   "scripts": {
     "build": "bun run ./build.ts",
-    "publish": "bun run build && cd dist && npm publish"
+    "publish": "bun run build && cd dist && bun publish"
   }
 }

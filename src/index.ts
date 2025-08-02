@@ -2,7 +2,7 @@ type Converters<K extends {}, V> = {
   key(key: K): RequestInfo;
   /** hack for response patch */
   patch?(value: Awaited<V>, ttl: number): Awaited<V>;
-  value(value: V, ttl: number): Response;
+  value(value: V, ttl: number): Response | Promise<Response>;
   decode(value: Response): V | Promise<V>;
 };
 
@@ -34,7 +34,7 @@ export class WorkersCacheStorage<K extends {}, V> {
     const cache = await this.#ensureCache();
     await cache.put(
       this.#converters.key(key),
-      this.#converters.value(value, ttl)
+      await this.#converters.value(value, ttl)
     );
   }
 
@@ -65,7 +65,7 @@ export class WorkersCacheStorage<K extends {}, V> {
       let value = await getValue();
       if (this.#converters.patch)
         value = this.#converters.patch(value, ttl) as any;
-      const response = this.#converters.value(value, ttl);
+      const response = await this.#converters.value(value, ttl);
       if (response.ok && response.status === 200)
         waitUntil
           ? waitUntil(cache.put(request, response))
